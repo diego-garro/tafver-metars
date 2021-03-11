@@ -4,7 +4,7 @@ Simple command line tool to download METAR's and TAF's for a given station.
 
 ## Installation
 
-For install only run ths command from your terminal
+For install only run this command from your terminal
 
 ```
 pip install tafver-metars
