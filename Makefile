@@ -2,9 +2,9 @@ POETRY=poetry
 POETRY_RUN=$(POETRY) run
 
 SOURCE_FILES=$(shell find . -path "./tafver_metars/*.py")
-TEST_FILES=$(shell find . -path "./test/*.py")
+TEST_FILES=$(shell find . -path "./tests/*.py")
 SOURCES_FOLDER=tafver_metars
-TESTS_FOLDER=test
+TESTS_FOLDER=tests
 
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 

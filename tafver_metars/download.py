@@ -1,5 +1,6 @@
-import re
+"""Module to download METAR's and TAF's from Ogimet.com"""
 
+import re
 from calendar import monthrange
 from datetime import datetime
 
@@ -52,38 +53,36 @@ def download_data_from_ogimet(icao_code: str, month: int, year=TODAY.year):
     metars = []
     tafs = []
     month_range = monthrange(year=year, month=month)
-        
-    if month >= 10:
-        month = f'{month}'
-    else:
-        month = f'0{month}'
 
-    url = f'https://www.ogimet.com/display_metars2.php?lugar={icao_code.lower()}&tipo=ALL&ord=DIR&nil=SI&fmt=txt&ano={year}&mes={month}&day=01&hora=00&anof={year}&mesf={month}&dayf={month_range[1]}&horaf=23&minf=59&enviar=Ver'
-    
+    if month >= 10:
+        month = f"{month}"
+    else:
+        month = f"0{month}"
+
+    url = f"https://www.ogimet.com/display_metars2.php?lugar={icao_code.lower()}&tipo=ALL&ord=DIR&nil=SI&fmt=txt&ano={year}&mes={month}&day=01&hora=00&anof={year}&mesf={month}&dayf={month_range[1]}&horaf=23&minf=59&enviar=Ver"
+
     try:
         res = get(url)
         html_soup = BeautifulSoup(res.text, "html.parser")
-        data = html_soup.text.split('\n')
-        
+        data = html_soup.text.split("\n")
+
         # Extract the METAR's from data
         for line in data[32:]:
-            if line == '':
+            if line == "":
                 break
             metars.append(line)
-        
+
         # Extract the TAF's from data
-        for line in data[32 + len(metars) + 6:]:
+        for line in data[32 + len(metars) + 6 :]:
             tafs.append(line.strip())
-        
+
         # Reensamble METAR's separated in several lines
         metars = _join_line_separated_metars(metars)
-        
+
         return metars, tafs
     except Exception as error:
-        logger.error('Some error ocurred: {}'.format(error))
+        logger.error("Some error ocurred: {}".format(error))
 
 
-if __name__ == '__main__':
-    download_data_from_ogimet('mroc', 1)
-    
-    
+if __name__ == "__main__":
+    download_data_from_ogimet("mroc", 1)
