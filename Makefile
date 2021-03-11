@@ -40,4 +40,4 @@ lint:
 	$(POETRY_RUN) black $(TEST_FILES) --check
 
 tests:
-	PYTHONPATH=. $(POETRY_RUN) pytest -vv test
+	PYTHONPATH=. $(POETRY_RUN) pytest -vv tests
