@@ -4,6 +4,9 @@ version = "0.0.0"
 description = "Download and formating METAR's and TAF's as a input for TAF-VER software verificator."
 authors = ["diego-garro <diego.garromolina@yahoo.com>"]
 
+[tool.poetry.scripts]
+tafver = 'tafver_metars.__main__:main'
+
 [tool.poetry.dependencies]
 python = "^3.6"
 click = "^7.1.2"
