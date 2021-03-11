@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tafver-metars"
-version = "0.0.0"
+version = "0.1.0"
 description = "Download and formating METAR's and TAF's as a input for TAF-VER software verificator."
 authors = ["diego-garro <diego.garromolina@yahoo.com>"]
 
