@@ -38,7 +38,7 @@ jobs:
       - name: Test
         run: |
           source $HOME/.poetry/env
-          make test
+          make tests
       
       - name: Build package
         run: |
