@@ -5,7 +5,7 @@ description = "Download and formating METAR's and TAF's as a input for TAF-VER s
 authors = ["diego-garro <diego.garromolina@yahoo.com>"]
 
 [tool.poetry.scripts]
-tafver = 'tafver_metars.__main__:main'
+tafver = 'tafver_metars.__main__:taf_ver'
 
 [tool.poetry.dependencies]
 python = "^3.6"
