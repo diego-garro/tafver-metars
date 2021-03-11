@@ -34,6 +34,7 @@ MANIFEST
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+logging.log
 
 # Unit test / coverage reports
 htmlcov/
@@ -73,6 +74,12 @@ ENV/
 env.bak/
 venv.bak/
 pythonenv*
+
+# example station folders
+mroc/
+mrpv/
+mrlm/
+mrlb/
 
 # mypy
 .mypy_cache/
