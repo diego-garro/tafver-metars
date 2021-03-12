@@ -41,6 +41,6 @@ If you need older year run
 tafver download kjfk -y 2020
 ```
 
-where `-y 2020` its an option and refers to the year 2020. Take in count that year must be
+where `-y 2020` its an option and refers to the year 2020. Take in count that the year must be
 older than 2004, only years from 2005 onwards are allowed. That's because only this years are
-in databases of Ogimet.com. 
+available in databases of Ogimet.com. 
