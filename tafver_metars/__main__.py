@@ -30,6 +30,9 @@ def taf_ver():
 @click.option("-m", "--month", type=click.INT, help="The month to download")
 @click.option("-y", "--year", type=click.INT, help="The year to download")
 def download(station_icao: str, month: int, year: int):
+    log = open('logging.log', 'w')
+    log.close()
+    
     try:
         os.mkdir(f"{station_icao}")
     except Exception as error:
@@ -46,7 +49,7 @@ def download(station_icao: str, month: int, year: int):
         elif year < 2005:
             raise YearError(message="The year to download must be older than 2004")
 
-    if year and month:
+    if year != None and month != None:
         metars, tafs = download_data_from_ogimet(station_icao, month, year=year)
         month = f"{month}" if month >= 10 else f"0{month}"
     elif year:

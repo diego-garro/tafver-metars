@@ -9,6 +9,7 @@ from requests import get
 
 from .console import console
 from .logger import logger
+from .sanitize import sanitize_metar
 
 TODAY = datetime.now()
 OGIMET_LIMIT_MESAGE = "#Sorry, Your quota limit for slow queries rate has been reached"
@@ -29,7 +30,7 @@ class OgimetLimitError(Exception):
         super().__init__(OGIMET_LIMIT_MESAGE)
 
 
-def _join_line_separated_metars(metar_list: list):
+def _join_line_separated_metars(metar_list: list, icao_code: str):
     """Joins the metar when it is separated in several lines
 
     Args:
@@ -43,7 +44,9 @@ def _join_line_separated_metars(metar_list: list):
     for line in metar_list:
         metar += re.sub(r"^\s{2,}", " ", line)
         if "=" in line:
-            correct_metar_list.append(metar)
+            sanitized = sanitize_metar(metar, icao_code)
+            correct_metar_list.append(sanitized)
+            #correct_metar_list.append(metar)
             metar = ""
 
     return correct_metar_list
@@ -76,8 +79,8 @@ def download_data_from_ogimet(icao_code: str, month: int, year=TODAY.year):
         for line in data[32 + len(metars) + 6 :]:
             tafs.append(line.strip())
 
-        # Reensamble METAR's separated in several lines
-        metars = _join_line_separated_metars(metars)
+        # Rensemble METAR's separated in several lines
+        metars = _join_line_separated_metars(metars, icao_code)
 
         return metars, tafs
     except Exception as error:
