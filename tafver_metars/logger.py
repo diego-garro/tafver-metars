@@ -1,16 +1,16 @@
 import logging
 import subprocess
 
-output = subprocess.check_output("git rev-parse --abbrev-ref HEAD", shell=True)
+is_git_repo = subprocess.check_output("git rev-parse --is-inside-work-tree", shell=True)
 
 logger = logging
-if output == "main":
-    logging_level = logging.INFO
+if is_git_repo.decode("utf-8").replace("\n", "") == "true":
+    logging_level = logging.DEBUG
 else:
-    loggin_level = logging.DEBUG
+    logging_level = logging.INFO
 
 logger.basicConfig(
-    level=loggin_level,
+    level=logging_level,
     format="%(asctime)s: %(levelname)s [%(filename)s:%(lineno)s] %(message)s",
     datefmt="%Y/%m/%d %I:%M:%S %p",
     handlers=[
