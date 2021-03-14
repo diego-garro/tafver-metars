@@ -1,10 +1,12 @@
 import logging
 import subprocess
 
-is_git_repo = subprocess.check_output("git rev-parse --is-inside-work-tree", shell=True)
+is_git_repo = subprocess.run(
+    ["git", "rev-parse"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+)
 
 logger = logging
-if is_git_repo.decode("utf-8").replace("\n", "") == "true":
+if is_git_repo.returncode == 0:
     logging_level = logging.DEBUG
 else:
     logging_level = logging.INFO
