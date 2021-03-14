@@ -1,7 +1,13 @@
 import logging
+import subprocess
+
+output = subprocess.check_output("git rev-parse --abbrev-ref HEAD", shell=True)
 
 logger = logging
-loggin_level = logging.DEBUG
+if output == "main":
+    logging_level = logging.INFO
+else:
+    loggin_level = logging.DEBUG
 
 logger.basicConfig(
     level=loggin_level,

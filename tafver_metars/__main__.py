@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from datetime import datetime
 
 import click
@@ -43,12 +43,15 @@ def download(station_icao: str, month: int, year: int):
     if month:
         if month > today.month and not year:
             raise MonthError()
+            exit()
 
     if year:
         if year > today.year:
             raise YearError()
+            exit()
         elif year < 2005:
             raise YearError(message="The year to download must be older than 2004")
+            exit()
 
     if year != None and month != None:
         metars, tafs = download_data_from_ogimet(station_icao, month, year=year)
