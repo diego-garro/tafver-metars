@@ -72,7 +72,7 @@ def _remove_suplementary_info(metar: str):
 
 
 def _remove_rmk_and_trend(metar: str):
-    metar = re.sub(r"\s?RMK.+", "", metar)
+    metar = re.sub(r"\s?RMK.+", "=", metar)
     metar = re.sub(
         r"\s?(BECMG|BECMG(0|O|\??\s?\?+)|VECMG|BCMG|BECMG/|BECM/|BCMG/|BECOMG|BECGM|BECM\sG).+",
         "=",

@@ -2,6 +2,19 @@
 
 Simple command line tool to download METAR's and TAF's for a given station.
 
+## Requirements
+
+This package requires:
+
+* [Python ^3.6][python-home]
+* [Git ^2.0.0][git-home]
+
+[python-home]: https://www.python.org
+[git-home]: https://git-scm.com
+
+Python because it was developed on that version and Git for discriminate the use
+and choose the logging level for that use.
+
 ## Installation
 
 For install only run this command from your terminal
