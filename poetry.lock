@@ -174,6 +174,17 @@ requirements_deprecated_finder = ["pipreqs", "pip-api"]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
 
 [[package]]
+name = "metar"
+version = "1.8.0"
+description = "Metar - a package to parse METAR-coded weather reports"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["pytest"]
+
+[[package]]
 name = "more-itertools"
 version = "8.7.0"
 description = "More routines for operating on iterables, beyond itertools"
@@ -381,7 +392,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "d3810500e31502a91eea968f0f69e8d07bded8e26481d5e1005fa6b366a2e9a5"
+content-hash = "f682b3d462cddd7d7d54b9eb510896a41e2344efb5ab5841979e5be2635f9fa7"
 
 [metadata.files]
 appdirs = [
@@ -446,6 +457,9 @@ importlib-metadata = [
 isort = [
     {file = "isort-5.7.0-py3-none-any.whl", hash = "sha256:fff4f0c04e1825522ce6949973e83110a6e907750cd92d128b0d14aaaadbffdc"},
     {file = "isort-5.7.0.tar.gz", hash = "sha256:c729845434366216d320e936b8ad6f9d681aab72dc7cbc2d51bedc3582f3ad1e"},
+]
+metar = [
+    {file = "metar-1.8.0.tar.gz", hash = "sha256:d23494c5dcb81a857de9f4022cab0cf3d37277a32f675a9e1491e817d56f8428"},
 ]
 more-itertools = [
     {file = "more-itertools-8.7.0.tar.gz", hash = "sha256:c5d6da9ca3ff65220c3bfd2a8db06d698f05d4d2b9be57e1deb2be5a45019713"},

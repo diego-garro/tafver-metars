@@ -15,7 +15,7 @@ TODAY = datetime.now()
 OGIMET_LIMIT_MESAGE = "#Sorry, Your quota limit for slow queries rate has been reached"
 
 
-class OgimetLimitError(Exception):
+class OgimetQuotaLimitError(Exception):
     """
     #Sorry, Your quota limit for slow queries rate has been reached
 
@@ -26,8 +26,8 @@ class OgimetLimitError(Exception):
     This exception is raised when that message is detected.
     """
 
-    def __init__(self):
-        super().__init__(OGIMET_LIMIT_MESAGE)
+    def __init__(self, message=OGIMET_LIMIT_MESAGE):
+        super().__init__(message + ". Wait a few minutes to execute a new request. :)")
 
 
 def _join_line_separated_metars(metar_list: list, icao_code: str):
@@ -46,7 +46,7 @@ def _join_line_separated_metars(metar_list: list, icao_code: str):
         if "=" in line:
             sanitized = sanitize_metar(metar, icao_code)
             correct_metar_list.append(sanitized)
-            #correct_metar_list.append(metar)
+            # correct_metar_list.append(metar)
             metar = ""
 
     return correct_metar_list
@@ -69,22 +69,32 @@ def download_data_from_ogimet(icao_code: str, month: int, year=TODAY.year):
         html_soup = BeautifulSoup(res.text, "html.parser")
         data = html_soup.text.split("\n")
 
-        # Extract the METAR's from data
-        for line in data[32:]:
-            if line == "":
-                break
-            metars.append(line)
+        # print(data)
+        # print(f'DATA: {data[:50]}')
+        # print(f'DATA: {data[-50:-1]}')
 
-        # Extract the TAF's from data
-        for line in data[32 + len(metars) + 6 :]:
-            tafs.append(line.strip())
+        if OGIMET_LIMIT_MESAGE in data:
+            raise OgimetQuotaLimitError()
+        elif "Fallo de consulta" in data[-1]:
+            raise OgimetQuotaLimitError(message=data[-1])
+        else:
+            # Extract the METAR's from data
+            for line in data[32:]:
+                if line == "":
+                    break
+                metars.append(line)
 
-        # Rensemble METAR's separated in several lines
-        metars = _join_line_separated_metars(metars, icao_code)
+            # Extract the TAF's from data
+            for line in data[32 + len(metars) + 6 :]:
+                tafs.append(line.strip())
 
-        return metars, tafs
+            # Rensemble METAR's separated in several lines
+            metars = _join_line_separated_metars(metars, icao_code)
+
+            return metars, tafs
     except Exception as error:
         logger.error("Some error ocurred: {}".format(error))
+        exit()
 
 
 if __name__ == "__main__":

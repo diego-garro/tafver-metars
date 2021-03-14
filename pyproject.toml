@@ -16,6 +16,7 @@ click = "^7.1.2"
 bs4 = "^0.0.1"
 requests = "^2.25.1"
 rich = "^9.13.0"
+metar = "^1.8.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

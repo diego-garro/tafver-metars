@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 
 import click
@@ -30,13 +31,13 @@ def taf_ver():
 @click.option("-m", "--month", type=click.INT, help="The month to download")
 @click.option("-y", "--year", type=click.INT, help="The year to download")
 def download(station_icao: str, month: int, year: int):
-    log = open('logging.log', 'w')
+    log = open("logging.log", "w")
     log.close()
-    
+
     try:
         os.mkdir(f"{station_icao}")
     except Exception as error:
-        logger.error(error)
+        logger.warning(error)
 
     today = datetime.now()
     if month:
