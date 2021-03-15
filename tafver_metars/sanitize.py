@@ -1,14 +1,15 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from metar import Metar
 
 from .logger import logger
 
 
-def _sanitize_type(metar: str, icao_code: str):
+def _sanitize_type_metar(metar: str, icao_code: str):
     metar = metar.replace("SPECI", "METAR")
     metar = metar.replace("COR", "")
+    metar = metar.replace("ZZ", "Z")
 
     if metar.count("METAR") == 0:
         icao = icao_code.upper()
@@ -17,49 +18,52 @@ def _sanitize_type(metar: str, icao_code: str):
     return metar
 
 
-def _sanitize_wind(metar: str):
+def _sanitize_wind(report: str):
+    report = report.replace("KTKT", "KT")
+    
     format = r"\s(?P<dir>\d{3})(?P<speed>\d{2})(?P<g>G?)(?P<gust>\d{2}?)(?P<units>(KT|MPS|KTS)?)\s"
     pattern = re.compile(format)
 
-    matches = re.search(pattern, metar)
+    matches = re.search(pattern, report)
 
     if matches:
         if matches.group("g") is None and matches.group("gust") is not None:
             correct_format = f'{matches.group("dir")}{matches.group("speed")}G{matches.group("gust")}{matches.group("units")}'
-            metar = re.sub(format, correct_format, metar)
+            report = re.sub(format, correct_format, report)
 
-    metar = re.sub(r"\d{3}V\d{3}", "", metar)
+    report = re.sub(r"\d{3}V\d{3}", "", report)
 
-    return metar
-
-
-def _sanitize_weather(metar: str):
-    metar = re.sub(r"DZ|SHRA", "RA", metar)
-    metar = re.sub(r"BR|HZ|[BP][CR]FG", "FG", metar)
-    metar = re.sub(r"(FG\s){2,}", "FG ", metar)
-    metar = re.sub(r"VC[A-Z][A-Z]", "", metar)
-    metar = re.sub(r"\+|-", "", metar)
-
-    return metar
+    return report
 
 
-def _sanitize_visibility(metar: str):
-    metar = metar.replace("CAVOK", "9999")
-    metar = re.sub(r"9999\s{2,}|99999", "9999 ", metar)
-    metar = re.sub(r"\s\d{3,4}[NS]([ENSW])?([EW])?", "", metar)
-    metar = re.sub(r"R\d{2}([A-Z])?/(P|M)?\d{4}(V(P|M)?\d{4})?(FT)?([NDU])?", "", metar)
+def _sanitize_weather(report: str):
+    report = re.sub(r"DZ|SHRA", "RA", report)
+    report = re.sub(r"BR|HZ|[BP][CR]FG", "FG", report)
+    report = re.sub(r"(FG\s){2,}", "FG ", report)
+    report = re.sub(r"VC[A-Z][A-Z]", "", report)
+    report = re.sub(r"\+|-", "", report)
 
-    return metar
+    return report
 
 
-def _sanitize_cloud(metar: str):
-    metar = re.sub(r"VV///|NSC", "", metar)
-    metar = re.sub(r"\s(GEW|FWE|HEW|FE[A-Z]W|F[A-Z]EW)", " FEW", metar)
-    metar = re.sub(r"\s(ACT|STC|DCT|SC[A-Z]T|S[A-Z]CT)", " SCT", metar)
-    metar = re.sub(r"\s(VKN|BNK|NNK|BK[A-Z]N|B[A-Z]KN)", " BKN", metar)
-    metar = re.sub(r"\s(IVC|PVC|OV[A-Z]C|O[A-Z]VC)", " OVC", metar)
+def _sanitize_visibility(report: str):
+    report = report.replace("CAVOK", "9999")
+    report = re.sub(r"9999\s{2,}|99999", "9999 ", report)
+    report = re.sub(r"\s\d{3,4}[NS]([ENSW])?([EW])?", "", report)
+    report = re.sub(r"R\d{2}([A-Z])?/(P|M)?\d{4}(V(P|M)?\d{4})?(FT)?([NDU])?", "", report)
 
-    return metar
+    return report
+
+
+def _sanitize_cloud(report: str):
+    report = re.sub(r"VV///|NSC", "", report)
+    report = re.sub(r"\s(GEW|FWE|HEW|FE[A-Z]W|F[A-Z]EW)", " FEW", report)
+    report = re.sub(r"\s(ACT|STC|DCT|SC[A-Z]T|S[A-Z]CT)", " SCT", report)
+    report = re.sub(r"\s(VKN|BNK|NNK|BK[A-Z]N|B[A-Z]KN)", " BKN", report)
+    report = re.sub(r"\s(IVC|PVC|OV[A-Z]C|O[A-Z]VC)", " OVC", report)
+    report = re.sub(r'TCU|TUC|CB', "", report)
+
+    return report
 
 
 def _remove_suplementary_info(metar: str):
@@ -108,10 +112,10 @@ def parse_metar(metar: str):
 def sanitize_metar(metar: str, icao_code: str):
     metar = _remove_rmk_and_trend(metar)
     metar = _remove_suplementary_info(metar)
-    metar = _sanitize_type(metar, icao_code)
+    metar = _sanitize_type_metar(metar, icao_code)
     metar = _sanitize_wind(metar)
-    metar = _sanitize_weather(metar)
     metar = _sanitize_visibility(metar)
+    metar = _sanitize_weather(metar)
     metar = _sanitize_cloud(metar)
 
     metar = re.sub(r"={2,}", "=", metar)
@@ -120,3 +124,52 @@ def sanitize_metar(metar: str, icao_code: str):
     parse_metar(metar)
 
     return metar
+
+
+def _sanitize_type_taf(taf: str, icao_code: str):
+    taf = re.sub(r"COR|AMD", "", taf)
+
+    if taf.count("TAF") == 0:
+        icao = icao_code.upper()
+        taf = taf.replace(icao, f"TAF {icao}")
+
+    return taf
+
+
+def _sanitize_validity_period(taf: str):
+    format = r'^\d{12}\s'
+    pattern = re.compile(format)
+    match = re.match(pattern, taf)
+    
+    if match:
+        date = datetime.strptime(taf[:12], "%Y%m%d%H%M")
+        format = r"\s\d{2}00/\d{2}00\s"
+        pattern = re.compile(format)
+        period_match = re.search(pattern, taf)
+        
+        if period_match:
+            period_date = date + timedelta(days=1)
+            period_day = f"{period_date.day}" if period_date.day >= 10 else f"0{period_date.day}"
+            taf = re.sub(format, f" {period_day}00/{period_day}24 ", taf)
+    
+    return taf
+
+
+def _sanitize_change_group_code(taf: str):
+    taf = re.sub(r'BECMG0|VECMG|BCMG|BECMG/|BECM/|BCMG/|BECOMG|BECGM|BECM\sG', 'BECMG', taf)
+    taf = re.sub(r'NOPSIG|NSIG|NPSIG|NOZIG|NOPZIG|NOSOG|MOSIG|NISIG|NOSGI|NOSI\sG|NOSIG0|NSOIG|NOSIIG', 'NOSIG', taf)
+    taf = re.sub(r'TMPO|TEMPOO|TMEPO|TEMOP|TEMO|TEMP\sO', 'TEMPO', taf)
+    
+    return taf
+
+
+def sanitize_taf(taf: str, icao_code: str):
+    taf = _sanitize_type_taf(taf, icao_code)
+    taf = _sanitize_validity_period(taf)
+    taf = _sanitize_wind(taf)
+    taf = _sanitize_visibility(taf)
+    taf = _sanitize_weather(taf)
+    taf = _sanitize_cloud(taf)
+    taf = _sanitize_change_group_code(taf)
+    
+    return taf

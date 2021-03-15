@@ -9,7 +9,7 @@ from requests import get
 
 from .console import console
 from .logger import logger
-from .sanitize import sanitize_metar
+from .sanitize import sanitize_metar, sanitize_taf
 
 TODAY = datetime.now()
 OGIMET_LIMIT_MESAGE = "#Sorry, Your quota limit for slow queries rate has been reached"
@@ -86,6 +86,7 @@ def download_data_from_ogimet(icao_code: str, month: int, year=TODAY.year):
 
             # Extract the TAF's from data
             for line in data[32 + len(metars) + 6 :]:
+                line = sanitize_taf(line, icao_code)
                 tafs.append(line.strip())
 
             # Rensemble METAR's separated in several lines
