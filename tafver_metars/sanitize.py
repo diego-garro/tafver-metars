@@ -20,7 +20,7 @@ def _sanitize_type_metar(metar: str, icao_code: str):
 
 def _sanitize_wind(report: str):
     report = report.replace("KTKT", "KT")
-    
+
     format = r"\s(?P<dir>\d{3})(?P<speed>\d{2})(?P<g>G?)(?P<gust>\d{2}?)(?P<units>(KT|MPS|KTS)?)\s"
     pattern = re.compile(format)
 
@@ -50,7 +50,9 @@ def _sanitize_visibility(report: str):
     report = report.replace("CAVOK", "9999")
     report = re.sub(r"9999\s{2,}|99999", "9999 ", report)
     report = re.sub(r"\s\d{3,4}[NS]([ENSW])?([EW])?", "", report)
-    report = re.sub(r"R\d{2}([A-Z])?/(P|M)?\d{4}(V(P|M)?\d{4})?(FT)?([NDU])?", "", report)
+    report = re.sub(
+        r"R\d{2}([A-Z])?/(P|M)?\d{4}(V(P|M)?\d{4})?(FT)?([NDU])?", "", report
+    )
 
     return report
 
@@ -61,7 +63,7 @@ def _sanitize_cloud(report: str):
     report = re.sub(r"\s(ACT|STC|DCT|SC[A-Z]T|S[A-Z]CT)", " SCT", report)
     report = re.sub(r"\s(VKN|BNK|NNK|BK[A-Z]N|B[A-Z]KN)", " BKN", report)
     report = re.sub(r"\s(IVC|PVC|OV[A-Z]C|O[A-Z]VC)", " OVC", report)
-    report = re.sub(r'TCU|TUC|CB', "", report)
+    report = re.sub(r"TCU|TUC|CB", "", report)
 
     return report
 
@@ -137,29 +139,37 @@ def _sanitize_type_taf(taf: str, icao_code: str):
 
 
 def _sanitize_validity_period(taf: str):
-    format = r'^\d{12}\s'
+    format = r"^\d{12}\s"
     pattern = re.compile(format)
     match = re.match(pattern, taf)
-    
+
     if match:
         date = datetime.strptime(taf[:12], "%Y%m%d%H%M")
         format = r"\s\d{2}00/\d{2}00\s"
         pattern = re.compile(format)
         period_match = re.search(pattern, taf)
-        
+
         if period_match:
             period_date = date + timedelta(days=1)
-            period_day = f"{period_date.day}" if period_date.day >= 10 else f"0{period_date.day}"
+            period_day = (
+                f"{period_date.day}" if period_date.day >= 10 else f"0{period_date.day}"
+            )
             taf = re.sub(format, f" {period_day}00/{period_day}24 ", taf)
-    
+
     return taf
 
 
 def _sanitize_change_group_code(taf: str):
-    taf = re.sub(r'BECMG0|VECMG|BCMG|BECMG/|BECM/|BCMG/|BECOMG|BECGM|BECM\sG', 'BECMG', taf)
-    taf = re.sub(r'NOPSIG|NSIG|NPSIG|NOZIG|NOPZIG|NOSOG|MOSIG|NISIG|NOSGI|NOSI\sG|NOSIG0|NSOIG|NOSIIG', 'NOSIG', taf)
-    taf = re.sub(r'TMPO|TEMPOO|TMEPO|TEMOP|TEMO|TEMP\sO', 'TEMPO', taf)
-    
+    taf = re.sub(
+        r"BECMG0|VECMG|BCMG|BECMG/|BECM/|BCMG/|BECOMG|BECGM|BECM\sG", "BECMG", taf
+    )
+    taf = re.sub(
+        r"NOPSIG|NSIG|NPSIG|NOZIG|NOPZIG|NOSOG|MOSIG|NISIG|NOSGI|NOSI\sG|NOSIG0|NSOIG|NOSIIG",
+        "NOSIG",
+        taf,
+    )
+    taf = re.sub(r"TMPO|TEMPOO|TMEPO|TEMOP|TEMO|TEMP\sO", "TEMPO", taf)
+
     return taf
 
 
@@ -171,5 +181,5 @@ def sanitize_taf(taf: str, icao_code: str):
     taf = _sanitize_weather(taf)
     taf = _sanitize_cloud(taf)
     taf = _sanitize_change_group_code(taf)
-    
+
     return taf
